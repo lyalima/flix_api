@@ -14,7 +14,7 @@ class MovieModelSerializer(serializers.ModelSerializer):
     
     # função para a lógica do campo calculado
     def get_rate(self, obj):
-        #calculo com ORM:
+        #cálculo com ORM:
         rate = obj.reviews.aggregate(Avg('stars'))['stars__avg']
 
         if rate:
@@ -46,6 +46,7 @@ class MovieModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('O ano de lançamento não pode ser anterior a 1990.')
         return value
     
+
     def validate_resume(self, value):
         if len(value) > 200:
             raise serializers.ValidationError('O resumo não pode ter mais de 200 caracteres.') 
