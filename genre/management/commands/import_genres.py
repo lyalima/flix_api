@@ -1,7 +1,6 @@
 import csv
-from datetime import datetime
 from django.core.management.base import BaseCommand
-from actors.models import Actor
+from genre.models import Genre
 
 
 class Command(BaseCommand):
@@ -10,9 +9,9 @@ class Command(BaseCommand):
         parser.add_argument(
             'file_name',
             type=str,
-            help='Nome do arquivo csv com atores.'
+            help='Nome do arquivo csv com gêneros de filmes.'
         )
-
+    
 
     def handle(self, *args, **options):
         file_name = options['file_name']
@@ -21,13 +20,9 @@ class Command(BaseCommand):
             reader = csv.DictReader(file)
             for row in reader:
                 name = row['name']
-                birthday = datetime.strptime(row['birthday'], '%Y-%m-%d').date()
-                nationality = row['nationality']
 
-                Actor.objects.create(
-                    name=name,
-                    birthday=birthday,
-                    nationality=nationality
+                Genre.objects.create(
+                    name=name
                 )
-
-        self.stdout.write(self.style.SUCCESS('ATORES CADASTRADOS COM SUCESSO!'))
+        
+        self.stdout.write(self.style.SUCCESS('GÊNEROS CADASTRADOS COM SUCESSO!'))
