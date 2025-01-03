@@ -1,17 +1,46 @@
 from rest_framework import serializers
 from django.db.models import Avg
 from .models import Movie
+from actors.serializers import ActorModelSerializer
+from genre.serializers import GenreModelSerializer
 from datetime import date
 
 
 class MovieModelSerializer(serializers.ModelSerializer):
-    # campo calculado de serializer
-    rate = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Movie
         fields = '__all__'
     
+    
+    def validate_release_date(self, value):
+        current_date = date.today()
+
+        if value > current_date:
+            raise serializers.ValidationError('A data de lançamento não pode ser posterior à data atual.') 
+        if value.year < 1990:
+            raise serializers.ValidationError('O ano de lançamento não pode ser anterior a 1990.')
+        return value
+    
+
+    def validate_resume(self, value):
+        if len(value) > 200:
+            raise serializers.ValidationError('O resumo não pode ter mais de 200 caracteres.') 
+        return value
+
+
+class MovieListDetailSerializer(serializers.ModelSerializer):
+
+    actors = ActorModelSerializer(many=True)
+    genre = GenreModelSerializer()
+    # campo calculado de serializer
+    rate = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Movie
+        fields = ['id', 'title', 'genre', 'actors', 'release_date', 'rate', 'resume']
+    
+
     # função para a lógica do campo calculado
     def get_rate(self, obj):
         #cálculo com ORM:
@@ -35,19 +64,3 @@ class MovieModelSerializer(serializers.ModelSerializer):
         #    count_reviews = reviews.count()
 
         #    return round(sum_reviews / count_reviews, 1)
-        
-
-    def validate_release_date(self, value):
-        current_date = date.today()
-
-        if value > current_date:
-            raise serializers.ValidationError('A data de lançamento não pode ser posterior à data atual.') 
-        if value.year < 1990:
-            raise serializers.ValidationError('O ano de lançamento não pode ser anterior a 1990.')
-        return value
-    
-
-    def validate_resume(self, value):
-        if len(value) > 200:
-            raise serializers.ValidationError('O resumo não pode ter mais de 200 caracteres.') 
-        return value

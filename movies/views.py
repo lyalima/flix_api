@@ -3,20 +3,32 @@ from rest_framework import generics, views, response, status
 from rest_framework.permissions import IsAuthenticated
 from .models import Movie
 from reviews.models import Review
-from .serializers import MovieModelSerializer
+from .serializers import MovieModelSerializer, MovieListDetailSerializer
 from core.permissions import GlobalDefaultPermission
 
 
 class MovieListCreate(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, GlobalDefaultPermission,)
     queryset = Movie.objects.all()
-    serializer_class = MovieModelSerializer
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+
+            return MovieListDetailSerializer
+        
+        MovieModelSerializer
 
 
 class MovieRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, GlobalDefaultPermission,)
     queryset = Movie.objects.all()
-    serializer_class = MovieModelSerializer
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+
+            return MovieListDetailSerializer
+        
+        MovieModelSerializer
 
 
 # endpoint de estatísticas, além do crud
